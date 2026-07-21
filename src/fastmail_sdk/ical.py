@@ -450,16 +450,14 @@ def build_event_uid() -> str:
 
 
 def default_today_range() -> tuple[datetime, datetime]:
-    """Return (start, end) covering the rest of today in UTC."""
-    now = datetime.now(timezone.utc)
-    tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    tomorrow = tomorrow.replace(day=now.day + 1) if now.hour > 0 else tomorrow
-    # Actually: from now until end of tomorrow
+    """Return (now_utc, tomorrow_midnight_utc) — matches Rust behavior."""
     from datetime import timedelta
 
+    now = datetime.now(timezone.utc)
+    # Midnight tomorrow in UTC
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    today_end = today_start + timedelta(days=1)
-    return now, today_end
+    tomorrow = today_start + timedelta(days=1)
+    return now, tomorrow
 
 
 def current_week_range() -> tuple[datetime, datetime]:
