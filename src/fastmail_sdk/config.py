@@ -41,11 +41,13 @@ def load_credentials() -> tuple[str, str]:
             import tomli as tomllib  # type: ignore[no-redef]
 
         data = tomllib.loads(config_file.read_text())
-        contacts = data.get("contacts", {})
-        if not username:
-            username = contacts.get("username")
-        if not app_password:
-            app_password = contacts.get("app_password")
+        # Check [calendar] first, then [contacts] for backward compatibility
+        for section in ("calendar", "contacts"):
+            cfg = data.get(section, {})
+            if not username:
+                username = cfg.get("username")
+            if not app_password:
+                app_password = cfg.get("app_password")
 
     if not username or not app_password:
         raise NotAuthenticated(
