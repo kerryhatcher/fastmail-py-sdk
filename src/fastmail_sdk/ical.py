@@ -442,3 +442,74 @@ def serialize_ical_event(event: CalendarEvent) -> str:
 def build_event_uid() -> str:
     """Generate a new unique event UID (UUID v4)."""
     return str(uuid.uuid4())
+
+
+# ------------------------------------------------------------------
+# Date range helpers (ported from the Rust fastmail-cli)
+# ------------------------------------------------------------------
+
+
+def default_today_range() -> tuple[datetime, datetime]:
+    """Return (start, end) covering the rest of today in UTC."""
+    now = datetime.now(timezone.utc)
+    tomorrow = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    tomorrow = tomorrow.replace(day=now.day + 1) if now.hour > 0 else tomorrow
+    # Actually: from now until end of tomorrow
+    from datetime import timedelta
+
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = today_start + timedelta(days=1)
+    return now, today_end
+
+
+def current_week_range() -> tuple[datetime, datetime]:
+    """Return (monday 00:00, next monday 00:00) in UTC."""
+    from datetime import timedelta
+
+    now = datetime.now(timezone.utc)
+    monday = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    monday -= timedelta(days=monday.weekday())
+    next_monday = monday + timedelta(days=7)
+    return monday, next_monday
+
+
+def parse_range_start(value: str) -> datetime:
+    """Parse a user-supplied range start into a UTC datetime."""
+    return _parse_user_range(value, end_of_day=False)
+
+
+def parse_range_end(value: str) -> datetime:
+    """Parse a user-supplied range end into a UTC datetime."""
+    return _parse_user_range(value, end_of_day=True)
+
+
+def _parse_user_range(value: str, end_of_day: bool) -> datetime:
+    """Parse a date or datetime string into a UTC datetime."""
+    from datetime import timedelta
+
+    # Try RFC 3339 first
+    try:
+        dt = datetime.fromisoformat(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except ValueError:
+        pass
+
+    # Try YYYY-MM-DD
+    try:
+        dt = datetime.strptime(value, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        if end_of_day:
+            dt += timedelta(days=1)
+        return dt
+    except ValueError:
+        pass
+
+    # Try YYYY-MM-DDTHH:MM or YYYY-MM-DDTHH:MM:SS
+    for fmt in ("%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S"):
+        try:
+            return datetime.strptime(value, fmt).replace(tzinfo=timezone.utc)
+        except ValueError:
+            pass
+
+    raise ValueError(f"Invalid date/time '{value}'. Use YYYY-MM-DD or RFC 3339.")
