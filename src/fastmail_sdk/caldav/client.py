@@ -529,7 +529,7 @@ def _parse_calendars_response(xml: str) -> list[Calendar]:
 
         if is_likely_default:
             default_id = cal_id
-        elif order is not None and (best_order is None or order < best_order):
+        elif default_id is None and order is not None and (best_order is None or order < best_order):
             best_order = order
             default_id = cal_id
 
