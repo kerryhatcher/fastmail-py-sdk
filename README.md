@@ -4,9 +4,9 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
-  <a href="https://github.com/kerryhatcher/fastmail-py-sdk/actions"><img src="https://img.shields.io/github/actions/workflow/status/kerryhatcher/fastmail-py-sdk/ci.yml" alt="CI"></a>
+  <a href="https://github.com/kerryhatcher/fastmail-py-sdk/actions"><img src="https://img.shields.io/github/actions/workflow/status/kerryhatcher/fastmail-py-sdk/ci.yml?branch=main" alt="CI"></a>
   <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/v/fastmail-py-sdk" alt="PyPI"></a>
-  <a href="#"><img src="https://img.shields.io/badge/python-3.13+-blue" alt="Python 3.13+"></a>
+  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/pyversions/fastmail-py-sdk" alt="Python"></a>
 </p>
 
 **fastmail-py-sdk** is an async Python SDK for the
