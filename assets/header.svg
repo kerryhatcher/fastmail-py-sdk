@@ -1,87 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="fastmail-py-sdk banner">
+  <title>fastmail-py-sdk</title>
   <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1E3A5F"/>
-      <stop offset="100%" stop-color="#0F2137"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16171f"/>
+      <stop offset="1" stop-color="#1f2136"/>
     </linearGradient>
-    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2563EB"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
-    </linearGradient>
-    <linearGradient id="envelopeGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2563EB" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.3"/>
+    <linearGradient id="chipBg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1b26"/>
+      <stop offset="1" stop-color="#282a44"/>
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="300" fill="url(#bgGrad)"/>
+  <rect width="1200" height="300" fill="url(#bg)"/>
 
-  <!-- Decorative geometric elements -->
-  <circle cx="1050" cy="60" r="120" fill="#2563EB" opacity="0.06"/>
-  <circle cx="1020" cy="240" r="80" fill="#06B6D4" opacity="0.08"/>
-  <circle cx="160" cy="200" r="60" fill="#2563EB" opacity="0.05"/>
+  <!-- decorative faint brackets -->
+  <text x="1010" y="230" font-family="ui-monospace, 'Cascadia Code', monospace" font-size="260" fill="#7dcfff" opacity="0.06" font-weight="700">{</text>
+  <text x="1110" y="230" font-family="ui-monospace, 'Cascadia Code', monospace" font-size="260" fill="#e0af68" opacity="0.06" font-weight="700">}</text>
 
-  <!-- Grid pattern overlay -->
-  <g opacity="0.03" stroke="#06B6D4" stroke-width="1">
-    <line x1="0" y1="60" x2="1200" y2="60"/>
-    <line x1="0" y1="120" x2="1200" y2="120"/>
-    <line x1="0" y1="180" x2="1200" y2="180"/>
-    <line x1="0" y1="240" x2="1200" y2="240"/>
+  <!-- faint code lines for terminal texture -->
+  <g font-family="ui-monospace, 'Cascadia Code', monospace" font-size="14" fill="#7dcfff" opacity="0.14">
+    <text x="720" y="60">async def send(msg: Message) -&gt; Envelope:</text>
+    <text x="750" y="82">await jmap.submit(msg)</text>
+    <text x="720" y="250">&gt;&gt;&gt; client.contacts.list()</text>
   </g>
 
-  <!-- Envelope icon (large, left side) -->
-  <g transform="translate(100, 90)">
-    <rect x="0" y="20" width="90" height="58" rx="6" stroke="url(#envelopeGrad)" stroke-width="2.5" fill="none"/>
-    <path d="M0 20 L45 52 L90 20" stroke="url(#envelopeGrad)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
-    <!-- Python snake detail -->
-    <g transform="translate(45, 46)">
-      <circle cx="0" cy="0" r="9" fill="#06B6D4" opacity="0.15"/>
-      <path d="M-5 0 L-1.5 5 L1.5 5 L5 0 L1.5 -5 L-1.5 -5 Z" fill="#06B6D4" opacity="0.7"/>
-    </g>
+  <!-- icon: terminal chip fused with envelope, scaled up -->
+  <g transform="translate(70,70)">
+    <rect x="0" y="0" width="160" height="160" rx="26" fill="url(#chipBg2)" stroke="#3b3d57" stroke-width="2"/>
+    <rect x="34" y="52" width="92" height="66" rx="7" fill="none" stroke="#7dcfff" stroke-width="5"/>
+    <path d="M34 55 L80 92 L126 55" fill="none" stroke="#7dcfff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M52 128 L70 110 L52 92" fill="none" stroke="#9ece6a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="80" y="105" width="16" height="11" fill="#e0af68">
+      <animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/>
+    </rect>
   </g>
 
-  <!-- Calendar icon (small, center-left) -->
-  <g transform="translate(230, 155)" opacity="0.4">
-    <rect x="0" y="4" width="28" height="26" rx="3" stroke="#06B6D4" stroke-width="1.5" fill="none"/>
-    <line x1="0" y1="12" x2="28" y2="12" stroke="#06B6D4" stroke-width="1.5"/>
-    <line x1="7" y1="0" x2="7" y2="8" stroke="#06B6D4" stroke-width="1.5"/>
-    <line x1="21" y1="0" x2="21" y2="8" stroke="#06B6D4" stroke-width="1.5"/>
-    <text x="14" y="25" text-anchor="middle" font-family="system-ui" font-size="9" fill="#06B6D4" font-weight="600">15</text>
+  <!-- wordmark -->
+  <g font-family="ui-monospace, SFMono-Regular, 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace" font-weight="700">
+    <text x="270" y="150" font-size="64" fill="#c0caf5">fastmail<tspan fill="#e0af68">-py-sdk</tspan></text>
   </g>
 
-  <!-- Contact card icon (small, center-left) -->
-  <g transform="translate(280, 155)" opacity="0.4">
-    <rect x="0" y="0" width="28" height="30" rx="4" stroke="#2563EB" stroke-width="1.5" fill="none"/>
-    <circle cx="14" cy="10" r="4" stroke="#2563EB" stroke-width="1.5" fill="none"/>
-    <path d="M5 25 Q5 20 14 20 Q23 20 23 25" stroke="#2563EB" stroke-width="1.5" fill="none"/>
+  <!-- tagline -->
+  <text x="272" y="195" font-family="ui-monospace, SFMono-Regular, 'Cascadia Code', monospace" font-size="22" fill="#9aa5ce">
+    Async Python SDK for Fastmail — email, calendars, contacts
+  </text>
+
+  <!-- prompt-style footer accent -->
+  <g font-family="ui-monospace, SFMono-Regular, 'Cascadia Code', monospace" font-size="18" fill="#9ece6a">
+    <text x="272" y="232">$ pip install fastmail-py-sdk</text>
   </g>
-
-  <!-- Project title -->
-  <text x="80" y="98" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="800" fill="url(#textGrad)" letter-spacing="-1">fastmail-py-sdk</text>
-
-  <!-- Tagline -->
-  <text x="82" y="138" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#94A3B8" letter-spacing="0.5">Python SDK for Fastmail — email, calendars, and contacts</text>
-
-  <!-- Feature pills -->
-  <g transform="translate(80, 176)">
-    <rect x="0" y="0" width="62" height="24" rx="12" fill="#2563EB" opacity="0.15"/>
-    <text x="31" y="16" text-anchor="middle" font-family="system-ui, monospace" font-size="11" fill="#60A5FA">JMAP</text>
-
-    <rect x="72" y="0" width="68" height="24" rx="12" fill="#06B6D4" opacity="0.15"/>
-    <text x="106" y="16" text-anchor="middle" font-family="system-ui, monospace" font-size="11" fill="#22D3EE">CalDAV</text>
-
-    <rect x="150" y="0" width="76" height="24" rx="12" fill="#06B6D4" opacity="0.15"/>
-    <text x="188" y="16" text-anchor="middle" font-family="system-ui, monospace" font-size="11" fill="#22D3EE">CardDAV</text>
-
-    <rect x="236" y="0" width="68" height="24" rx="12" fill="#2563EB" opacity="0.1"/>
-    <text x="270" y="16" text-anchor="middle" font-family="system-ui, monospace" font-size="11" fill="#93C5FD">Pydantic</text>
-
-    <rect x="314" y="0" width="52" height="24" rx="12" fill="#2563EB" opacity="0.1"/>
-    <text x="340" y="16" text-anchor="middle" font-family="system-ui, monospace" font-size="11" fill="#93C5FD">Async</text>
-  </g>
-
-  <!-- Bottom bar -->
-  <rect x="80" y="232" width="1040" height="1" fill="#1E3A5F" opacity="0.3"/>
-  <text x="80" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569" letter-spacing="0.5">A Python port of the Rust fastmail-cli · MIT Licensed</text>
 </svg>

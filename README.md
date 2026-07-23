@@ -1,12 +1,13 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kerryhatcher/fastmail-py-sdk/main/assets/header-light.svg" alt="fastmail-py-sdk" width="100%">
+  <img src="assets/header.svg" alt="fastmail-py-sdk — Async Python SDK for Fastmail: email, calendars, contacts" width="100%">
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
-  <a href="https://github.com/kerryhatcher/fastmail-py-sdk/actions"><img src="https://img.shields.io/github/actions/workflow/status/kerryhatcher/fastmail-py-sdk/ci.yml?branch=main" alt="CI"></a>
-  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/v/fastmail-py-sdk" alt="PyPI"></a>
-  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/pyversions/fastmail-py-sdk" alt="Python"></a>
+  <a href="https://github.com/kerryhatcher/fastmail-py-sdk/actions/workflows/ci.yml"><img src="https://github.com/kerryhatcher/fastmail-py-sdk/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/v/fastmail-py-sdk.svg" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/pyversions/fastmail-py-sdk.svg" alt="Python versions"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/badge/lint-ruff-261230.svg" alt="Linted with Ruff"></a>
 </p>
 
 **fastmail-py-sdk** is an async Python SDK for the

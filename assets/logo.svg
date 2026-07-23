@@ -1,19 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 372 108" width="372" height="108" role="img" aria-label="fastmail-py-sdk logo">
+  <title>fastmail-py-sdk</title>
   <defs>
-    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2563EB"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16171f"/>
+      <stop offset="1" stop-color="#1f2136"/>
+    </linearGradient>
+    <linearGradient id="chipBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a1b26"/>
+      <stop offset="1" stop-color="#24263a"/>
     </linearGradient>
   </defs>
-  <!-- Envelope body -->
-  <rect x="10" y="28" width="100" height="62" rx="8" stroke="url(#grad)" stroke-width="3" fill="none"/>
-  <!-- Envelope flap (top triangle) -->
-  <path d="M10 28 L60 62 L110 28" stroke="url(#grad)" stroke-width="3" fill="none" stroke-linejoin="round"/>
-  <!-- Python snake icon in center -->
-  <g transform="translate(60, 56)">
-    <circle cx="0" cy="0" r="8" fill="url(#grad)" opacity="0.15"/>
-    <path d="M-4 0 L-1 4 L1 4 L4 0 L1 -4 L-1 -4 Z" fill="url(#grad)"/>
+
+  <!-- self-contained dark panel so the wordmark reads on any GitHub theme -->
+  <rect x="0" y="0" width="372" height="108" rx="18" fill="url(#panel)"/>
+
+  <!-- icon: terminal chip fused with envelope -->
+  <g transform="translate(10,10)">
+    <rect x="6" y="6" width="88" height="88" rx="16" fill="url(#chipBg)" stroke="#3b3d57" stroke-width="1.5"/>
+    <rect x="22" y="30" width="56" height="40" rx="4" fill="none" stroke="#7dcfff" stroke-width="3"/>
+    <path d="M22 32 L50 54 L78 32" fill="none" stroke="#7dcfff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- prompt chevron ">" doubling as envelope seal / cursor -->
+    <path d="M32 78 L42 68 L32 58" fill="none" stroke="#9ece6a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="48" y="65" width="10" height="7" fill="#e0af68">
+      <animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/>
+    </rect>
   </g>
-  <!-- Fastmail FM monogram below -->
-  <text x="60" y="92" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#1E3A5F" letter-spacing="2">PY</text>
+
+  <!-- wordmark -->
+  <g font-family="ui-monospace, SFMono-Regular, 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace" font-size="30" font-weight="600">
+    <text x="122" y="58" fill="#c0caf5">fastmail</text>
+    <text x="122" y="88" fill="#e0af68">-py-sdk</text>
+  </g>
+  <text x="124" y="40" font-family="ui-monospace, SFMono-Regular, 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace" font-size="13" fill="#7dcfff" opacity="0.85">async&#160;·&#160;jmap&#160;·&#160;caldav&#160;·&#160;carddav</text>
 </svg>
