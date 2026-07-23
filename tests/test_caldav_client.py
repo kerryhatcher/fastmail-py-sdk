@@ -7,13 +7,14 @@ from fastmail_sdk.caldav.client import CalDavClient, _parse_calendars_response
 from fastmail_sdk.errors import CalendarNotFound, EventNotFound
 from fastmail_sdk.models.event import CalendarEvent, EventDateTime, EventQuery
 
-
 # ------------------------------------------------------------------
 # XML response parsing
 # ------------------------------------------------------------------
 
 CALENDARS_MULTISTATUS = """<?xml version="1.0" encoding="utf-8"?>
-<d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav" xmlns:apple="http://apple.com/ns/ical/" xmlns:cs="http://calendarserver.org/ns/">
+<d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"
+  xmlns:apple="http://apple.com/ns/ical/"
+  xmlns:cs="http://calendarserver.org/ns/">
   <d:response>
     <d:href>/dav/calendars/user/test@fastmail.com/Default/</d:href>
     <d:propstat>
@@ -108,12 +109,14 @@ def test_list_calendars(respx_mock, client, calendar_home_xml):
     """list_calendars discovers the home and fetches calendars."""
     # PROPFIND on principal → calendar-home-set
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=calendar_home_xml))
 
     # PROPFIND on calendar home → calendar list
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=CALENDARS_MULTISTATUS))
 
     async def run():
@@ -123,16 +126,19 @@ def test_list_calendars(respx_mock, client, calendar_home_xml):
             assert calendars[0].name == "Default"
 
     import asyncio
+
     asyncio.run(run())
 
 
 def test_get_calendar_by_id_found(respx_mock, client, calendar_home_xml):
     """get_calendar_by_id returns the matching calendar."""
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=calendar_home_xml))
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=CALENDARS_MULTISTATUS))
 
     async def run():
@@ -142,16 +148,19 @@ def test_get_calendar_by_id_found(respx_mock, client, calendar_home_xml):
             assert cal.color == "#ff6b6b"
 
     import asyncio
+
     asyncio.run(run())
 
 
 def test_get_calendar_by_id_not_found(respx_mock, client, calendar_home_xml):
     """get_calendar_by_id raises CalendarNotFound for unknown IDs."""
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=calendar_home_xml))
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=CALENDARS_MULTISTATUS))
 
     async def run():
@@ -160,6 +169,7 @@ def test_get_calendar_by_id_not_found(respx_mock, client, calendar_home_xml):
                 await client.get_calendar_by_id("nonexistent")
 
     import asyncio
+
     asyncio.run(run())
 
 
@@ -192,21 +202,30 @@ END:VCALENDAR</c:calendar-data>
 def test_list_events(respx_mock, client, calendar_home_xml):
     """list_events fetches and parses events from all calendars."""
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=calendar_home_xml))
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=CALENDARS_MULTISTATUS))
     # REPORT on Default calendar
     respx_mock.request(
-        "REPORT", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Default/",
+        "REPORT",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Default/",
     ).mock(return_value=Response(207, content=EVENTS_REPORT))
     # REPORT on Work calendar (empty)
     respx_mock.request(
-        "REPORT", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Work/",
-    ).mock(return_value=Response(207, content="""<?xml version="1.0"?>
+        "REPORT",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Work/",
+    ).mock(
+        return_value=Response(
+            207,
+            content="""<?xml version="1.0"?>
 <d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
-</d:multistatus>"""))
+</d:multistatus>""",
+        )
+    )
 
     async def run():
         async with client:
@@ -219,27 +238,37 @@ def test_list_events(respx_mock, client, calendar_home_xml):
             assert events[0].start.timezone == "America/Chicago"
 
     import asyncio
+
     asyncio.run(run())
 
 
 def test_get_event_by_id_found(respx_mock, client, calendar_home_xml):
     """get_event_by_id finds an event via UID REPORT."""
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=calendar_home_xml))
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=CALENDARS_MULTISTATUS))
     # UID REPORT on Default
     respx_mock.request(
-        "REPORT", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Default/",
+        "REPORT",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Default/",
     ).mock(return_value=Response(207, content=EVENTS_REPORT))
     # UID REPORT on Work (no match)
     respx_mock.request(
-        "REPORT", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Work/",
-    ).mock(return_value=Response(207, content="""<?xml version="1.0"?>
+        "REPORT",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Work/",
+    ).mock(
+        return_value=Response(
+            207,
+            content="""<?xml version="1.0"?>
 <d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
-</d:multistatus>"""))
+</d:multistatus>""",
+        )
+    )
 
     async def run():
         async with client:
@@ -247,26 +276,31 @@ def test_get_event_by_id_found(respx_mock, client, calendar_home_xml):
             assert event.title == "Team Standup"
 
     import asyncio
+
     asyncio.run(run())
 
 
 def test_get_event_by_id_not_found(respx_mock, client, calendar_home_xml):
     """get_event_by_id raises EventNotFound when no calendar has the event."""
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=calendar_home_xml))
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=CALENDARS_MULTISTATUS))
     # Both calendars return empty
     empty = """<?xml version="1.0"?>
 <d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
 </d:multistatus>"""
     respx_mock.request(
-        "REPORT", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Default/",
+        "REPORT",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Default/",
     ).mock(return_value=Response(207, content=empty))
     respx_mock.request(
-        "REPORT", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Work/",
+        "REPORT",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Work/",
     ).mock(return_value=Response(207, content=empty))
 
     async def run():
@@ -275,26 +309,31 @@ def test_get_event_by_id_not_found(respx_mock, client, calendar_home_xml):
                 await client.get_event_by_id("nonexistent")
 
     import asyncio
+
     asyncio.run(run())
 
 
 def test_create_event(respx_mock, client, calendar_home_xml):
     """create_event PUTs an iCalendar body and returns the created event."""
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/principals/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=calendar_home_xml))
     respx_mock.request(
-        "PROPFIND", "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
+        "PROPFIND",
+        "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/",
     ).mock(return_value=Response(207, content=CALENDARS_MULTISTATUS))
     respx_mock.put(
         "https://caldav.fastmail.com/dav/calendars/user/test@fastmail.com/Default/new-event.ics",
-    ).mock(return_value=Response(
-        201,
-        headers={
-            "ETag": '"new-etag"',
-            "Location": "/dav/calendars/user/test@fastmail.com/Default/new-event.ics",
-        },
-    ))
+    ).mock(
+        return_value=Response(
+            201,
+            headers={
+                "ETag": '"new-etag"',
+                "Location": "/dav/calendars/user/test@fastmail.com/Default/new-event.ics",
+            },
+        )
+    )
 
     async def run():
         async with client:
@@ -311,4 +350,5 @@ def test_create_event(respx_mock, client, calendar_home_xml):
             assert created.calendar_name == "Default"
 
     import asyncio
+
     asyncio.run(run())

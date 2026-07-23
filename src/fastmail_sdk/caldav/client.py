@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import UTC, datetime
 from xml.etree import ElementTree as ET
 
 import httpx
@@ -110,7 +109,9 @@ class CalDavClient:
         principal_href = f"/dav/principals/user/{self.username}/"
         url = f"{self.base_url}{principal_href}"
         response = await self.client.request(
-            "PROPFIND", url, content=calendar_home_propfind(),
+            "PROPFIND",
+            url,
+            content=calendar_home_propfind(),
             headers={"Content-Type": "application/xml", "Depth": "0"},
         )
         if response.status_code not in (207, 200):
@@ -136,7 +137,9 @@ class CalDavClient:
         home = await self.discover_calendar_home()
         url = f"{self.base_url}{home}"
         response = await self.client.request(
-            "PROPFIND", url, content=list_calendars_propfind(),
+            "PROPFIND",
+            url,
+            content=list_calendars_propfind(),
             headers={"Content-Type": "application/xml", "Depth": "1"},
         )
         if response.status_code not in (207, 200):
@@ -174,7 +177,9 @@ class CalDavClient:
         url = f"{self.base_url}{href}"
 
         response = await self.client.request(
-            "MKCALENDAR", url, content=mkcalendar_body(name, color),
+            "MKCALENDAR",
+            url,
+            content=mkcalendar_body(name, color),
             headers={"Content-Type": "application/xml"},
         )
         if response.status_code not in (201, 200, 204):
@@ -185,7 +190,7 @@ class CalDavClient:
 
         created_href = response.headers.get("Location", href)
         if created_href.startswith(self.base_url):
-            created_href = created_href[len(self.base_url):]
+            created_href = created_href[len(self.base_url) :]
 
         return Calendar(
             id=_resource_id_from_href(created_href),
@@ -197,7 +202,10 @@ class CalDavClient:
         )
 
     async def update_calendar(
-        self, calendar: Calendar, name: str | None = None, color: str | None = None,
+        self,
+        calendar: Calendar,
+        name: str | None = None,
+        color: str | None = None,
     ) -> Calendar:
         """Update a calendar's display name and/or color."""
         url = f"{self.base_url}{calendar.href}"
@@ -209,7 +217,9 @@ class CalDavClient:
         new_color = color if color is not None else calendar.color
 
         response = await self.client.request(
-            "PROPPATCH", url, content=proppatch_calendar_body(new_name, new_color),
+            "PROPPATCH",
+            url,
+            content=proppatch_calendar_body(new_name, new_color),
             headers=headers,
         )
         if response.status_code not in (200, 204, 207):
@@ -293,11 +303,16 @@ class CalDavClient:
         return all_events
 
     async def _list_events_in_calendar(
-        self, calendar: Calendar, start: str | None, end: str | None,
+        self,
+        calendar: Calendar,
+        start: str | None,
+        end: str | None,
     ) -> list[CalendarEvent]:
         url = f"{self.base_url}{calendar.href}"
         response = await self.client.request(
-            "REPORT", url, content=calendar_query_body(start, end),
+            "REPORT",
+            url,
+            content=calendar_query_body(start, end),
             headers={"Content-Type": "application/xml", "Depth": "1"},
         )
         if response.status_code not in (207, 200):
@@ -307,11 +322,17 @@ class CalDavClient:
             )
 
         return _parse_events_response(
-            response.text, calendar.id, calendar.name, start, end,
+            response.text,
+            calendar.id,
+            calendar.name,
+            start,
+            end,
         )
 
     async def get_event_by_id(
-        self, event_id: str, calendar_id: str | None = None,
+        self,
+        event_id: str,
+        calendar_id: str | None = None,
     ) -> CalendarEvent:
         """Fetch a single event by UID.
 
@@ -326,7 +347,9 @@ class CalDavClient:
             url = f"{self.base_url}{cal.href}"
             try:
                 response = await self.client.request(
-                    "REPORT", url, content=uid_report_body(event_id),
+                    "REPORT",
+                    url,
+                    content=uid_report_body(event_id),
                     headers={"Content-Type": "application/xml", "Depth": "1"},
                 )
             except httpx.HTTPError:
@@ -339,12 +362,17 @@ class CalDavClient:
             if response.status_code not in (207, 200):
                 logger.warning(
                     "UID REPORT returned %s for calendar %s",
-                    response.status_code, cal.id,
+                    response.status_code,
+                    cal.id,
                 )
                 return None
 
             events = _parse_events_response(
-                response.text, cal.id, cal.name, None, None,
+                response.text,
+                cal.id,
+                cal.name,
+                None,
+                None,
             )
             for event in events:
                 if event.id == event_id:
@@ -363,7 +391,9 @@ class CalDavClient:
         raise EventNotFound(event_id)
 
     async def _get_event_by_id_full_fetch(
-        self, event_id: str, calendar_id: str | None,
+        self,
+        event_id: str,
+        calendar_id: str | None,
     ) -> CalendarEvent:
         """Fallback: scan all events in the target calendar(s)."""
         calendars = await self._resolve_calendars(calendar_id)
@@ -379,7 +409,9 @@ class CalDavClient:
         raise EventNotFound(event_id)
 
     async def create_event(
-        self, calendar_id: str | None, event: CalendarEvent,
+        self,
+        calendar_id: str | None,
+        event: CalendarEvent,
     ) -> CalendarEvent:
         """Create a new event in the specified calendar (or the default)."""
         calendar = await self._resolve_calendar(calendar_id)
@@ -388,7 +420,8 @@ class CalDavClient:
         body = serialize_ical_event(event)
 
         response = await self.client.put(
-            url, content=body,
+            url,
+            content=body,
             headers={
                 "Content-Type": "text/calendar; charset=utf-8",
                 "If-None-Match": "*",
@@ -407,12 +440,14 @@ class CalDavClient:
         created.calendar_name = calendar.name
         created.href = response.headers.get("Location", href)
         if created.href and created.href.startswith(self.base_url):
-            created.href = created.href[len(self.base_url):]
+            created.href = created.href[len(self.base_url) :]
         created.etag = response.headers.get("ETag")
         return created
 
     async def update_event(
-        self, event: CalendarEvent, previous_etag: str,
+        self,
+        event: CalendarEvent,
+        previous_etag: str,
     ) -> CalendarEvent:
         """Update an existing event (requires the current ETag)."""
         if not event.href:
@@ -421,7 +456,8 @@ class CalDavClient:
         body = serialize_ical_event(event)
 
         response = await self.client.put(
-            url, content=body,
+            url,
+            content=body,
             headers={
                 "Content-Type": "text/calendar; charset=utf-8",
                 "If-Match": previous_etag,
@@ -430,7 +466,9 @@ class CalDavClient:
         if response.status_code not in (200, 204, 201):
             if response.status_code == 412:
                 raise EventConflict(
-                    event.id, previous_etag, response.headers.get("ETag"),
+                    event.id,
+                    previous_etag,
+                    response.headers.get("ETag"),
                 )
             if response.status_code == 404:
                 raise EventNotFound(event.id)
@@ -457,7 +495,9 @@ class CalDavClient:
 
         if response.status_code == 412:
             raise EventConflict(
-                event.id, event.etag, response.headers.get("ETag"),
+                event.id,
+                event.etag,
+                response.headers.get("ETag"),
             )
         if response.status_code == 404:
             raise EventNotFound(event.id)
@@ -511,25 +551,26 @@ def _parse_calendars_response(xml: str) -> list[Calendar]:
         order = int(order_str) if order_str and order_str.isdigit() else None
 
         cal_id = _resource_id_from_href(href)
-        is_likely_default = (
-            "/Default/" in href
-            or name.lower() in ("default", "calendar")
-        )
+        is_likely_default = "/Default/" in href or name.lower() in ("default", "calendar")
 
-        calendars.append(Calendar(
-            id=cal_id,
-            name=name,
-            color=color,
-            description=description,
-            href=href,
-            etag=etag,
-            ctag=ctag,
-            is_default=False,
-        ))
+        calendars.append(
+            Calendar(
+                id=cal_id,
+                name=name,
+                color=color,
+                description=description,
+                href=href,
+                etag=etag,
+                ctag=ctag,
+                is_default=False,
+            )
+        )
 
         if is_likely_default:
             default_id = cal_id
-        elif default_id is None and order is not None and (best_order is None or order < best_order):
+        elif (
+            default_id is None and order is not None and (best_order is None or order < best_order)
+        ):
             best_order = order
             default_id = cal_id
 

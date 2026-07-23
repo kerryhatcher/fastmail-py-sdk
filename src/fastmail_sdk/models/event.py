@@ -31,7 +31,9 @@ class EventAttendee(BaseModel):
     )
     partstat: str | None = Field(
         default=None,
-        description="NEEDS-ACTION, ACCEPTED, DECLINED, TENTATIVE, DELEGATED, COMPLETED, or IN-PROCESS",
+        description=(
+            "NEEDS-ACTION, ACCEPTED, DECLINED, TENTATIVE, DELEGATED, COMPLETED, or IN-PROCESS"
+        ),
     )
     rsvp: bool | None = None
 
@@ -39,11 +41,15 @@ class EventAttendee(BaseModel):
 class EventRecurrence(BaseModel):
     """Recurrence rule (RRULE)."""
 
-    frequency: str = Field(description="SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, or YEARLY")
+    frequency: str = Field(
+        description="SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, or YEARLY"
+    )
     interval: int | None = Field(default=None, ge=1)
     count: int | None = Field(default=None, ge=1)
     until: str | None = Field(default=None, description="YYYYMMDD or YYYYMMDDTHHMMSSZ")
-    by_day: list[str] = Field(default_factory=list, description="e.g. ['MO', 'WE', 'FR'] or ['-1SU']")
+    by_day: list[str] = Field(
+        default_factory=list, description="e.g. ['MO', 'WE', 'FR'] or ['-1SU']"
+    )
 
 
 class EventReminder(BaseModel):
@@ -59,7 +65,9 @@ class CalendarEvent(BaseModel):
     id: str = Field(description="UID — unique across all calendars")
     calendar_id: str = Field(description="Resource ID of the parent calendar")
     calendar_name: str | None = Field(default=None)
-    href: str | None = Field(default=None, description="CalDAV resource path, e.g. '/dav/.../uid.ics'")
+    href: str | None = Field(
+        default=None, description="CalDAV resource path, e.g. '/dav/.../uid.ics'"
+    )
     etag: str | None = Field(default=None, description="Current ETag for optimistic concurrency")
     title: str
     start: EventDateTime
@@ -82,11 +90,15 @@ class EventQuery(BaseModel):
 class EventCreate(BaseModel):
     """Input for creating a new event."""
 
-    calendar_id: str | None = Field(default=None, description="Target calendar; defaults to the primary calendar")
+    calendar_id: str | None = Field(
+        default=None, description="Target calendar; defaults to the primary calendar"
+    )
     title: str
     start: str = Field(description="YYYY-MM-DD, YYYY-MM-DDTHH:MM[:SS], or RFC 3339")
     end: str = Field(description="YYYY-MM-DD, YYYY-MM-DDTHH:MM[:SS], or RFC 3339")
-    timezone: str | None = Field(default=None, description="IANA timezone for naive local datetimes")
+    timezone: str | None = Field(
+        default=None, description="IANA timezone for naive local datetimes"
+    )
     location: str | None = None
     description: str | None = None
     attendees: list[str] = Field(default_factory=list, description="Email addresses")

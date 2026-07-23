@@ -48,8 +48,7 @@ class EventConflict(FastmailError):
         self.sent_etag = sent_etag
         self.server_etag = server_etag
         super().__init__(
-            f"Event conflict for '{event_id}': "
-            f"sent ETag '{sent_etag}', server has '{server_etag}'"
+            f"Event conflict for '{event_id}': sent ETag '{sent_etag}', server has '{server_etag}'"
         )
 
 

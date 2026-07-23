@@ -228,20 +228,28 @@ class JmapClient:
             return self._cached_mailboxes
 
         account_id = self._account_id()
-        responses = await self._request([
+        responses = await self._request(
             [
-                "Mailbox/get",
-                {
-                    "accountId": account_id,
-                    "properties": [
-                        "id", "name", "parentId", "role",
-                        "totalEmails", "unreadEmails",
-                        "totalThreads", "unreadThreads", "sortOrder",
-                    ],
-                },
-                "m0",
+                [
+                    "Mailbox/get",
+                    {
+                        "accountId": account_id,
+                        "properties": [
+                            "id",
+                            "name",
+                            "parentId",
+                            "role",
+                            "totalEmails",
+                            "unreadEmails",
+                            "totalThreads",
+                            "unreadThreads",
+                            "sortOrder",
+                        ],
+                    },
+                    "m0",
+                ]
             ]
-        ])
+        )
 
         data = self._parse_response(responses[0], "Mailbox/get")
         mailboxes = [Mailbox.model_validate(m) for m in data.get("list", [])]
@@ -270,35 +278,46 @@ class JmapClient:
     async def list_emails(self, mailbox_id: str, limit: int = 50) -> list[Email]:
         """List emails in a mailbox, newest first."""
         account_id = self._account_id()
-        responses = await self._request([
+        responses = await self._request(
             [
-                "Email/query",
-                {
-                    "accountId": account_id,
-                    "filter": {"inMailbox": mailbox_id},
-                    "sort": [{"property": "receivedAt", "isAscending": False}],
-                    "limit": limit,
-                },
-                "q0",
-            ],
-            [
-                "Email/get",
-                {
-                    "accountId": account_id,
-                    "#ids": {
-                        "resultOf": "q0",
-                        "name": "Email/query",
-                        "path": "/ids",
+                [
+                    "Email/query",
+                    {
+                        "accountId": account_id,
+                        "filter": {"inMailbox": mailbox_id},
+                        "sort": [{"property": "receivedAt", "isAscending": False}],
+                        "limit": limit,
                     },
-                    "properties": [
-                        "id", "threadId", "mailboxIds", "keywords",
-                        "size", "receivedAt", "from", "to", "cc",
-                        "subject", "preview", "hasAttachment",
-                    ],
-                },
-                "g0",
-            ],
-        ])
+                    "q0",
+                ],
+                [
+                    "Email/get",
+                    {
+                        "accountId": account_id,
+                        "#ids": {
+                            "resultOf": "q0",
+                            "name": "Email/query",
+                            "path": "/ids",
+                        },
+                        "properties": [
+                            "id",
+                            "threadId",
+                            "mailboxIds",
+                            "keywords",
+                            "size",
+                            "receivedAt",
+                            "from",
+                            "to",
+                            "cc",
+                            "subject",
+                            "preview",
+                            "hasAttachment",
+                        ],
+                    },
+                    "g0",
+                ],
+            ]
+        )
 
         data = self._parse_response(responses[1], "Email/get")
         return [Email.model_validate(e) for e in data.get("list", [])]
@@ -306,25 +325,45 @@ class JmapClient:
     async def get_email(self, email_id: str) -> Email:
         """Fetch a single email with full content."""
         account_id = self._account_id()
-        responses = await self._request([
+        responses = await self._request(
             [
-                "Email/get",
-                {
-                    "accountId": account_id,
-                    "ids": [email_id],
-                    "properties": [
-                        "id", "blobId", "threadId", "mailboxIds", "keywords",
-                        "size", "receivedAt", "messageId", "inReplyTo", "references",
-                        "from", "to", "cc", "bcc", "replyTo", "subject", "sentAt",
-                        "preview", "hasAttachment", "textBody", "htmlBody", "attachments",
-                        "bodyValues",
-                    ],
-                    "fetchTextBodyValues": True,
-                    "fetchHTMLBodyValues": True,
-                },
-                "g0",
+                [
+                    "Email/get",
+                    {
+                        "accountId": account_id,
+                        "ids": [email_id],
+                        "properties": [
+                            "id",
+                            "blobId",
+                            "threadId",
+                            "mailboxIds",
+                            "keywords",
+                            "size",
+                            "receivedAt",
+                            "messageId",
+                            "inReplyTo",
+                            "references",
+                            "from",
+                            "to",
+                            "cc",
+                            "bcc",
+                            "replyTo",
+                            "subject",
+                            "sentAt",
+                            "preview",
+                            "hasAttachment",
+                            "textBody",
+                            "htmlBody",
+                            "attachments",
+                            "bodyValues",
+                        ],
+                        "fetchTextBodyValues": True,
+                        "fetchHTMLBodyValues": True,
+                    },
+                    "g0",
+                ]
             ]
-        ])
+        )
 
         data = self._parse_response(responses[0], "Email/get")
         not_found = data.get("notFound", [])
@@ -345,9 +384,9 @@ class JmapClient:
         account_id = self._account_id()
 
         # Get thread to find all email IDs
-        responses = await self._request([
-            ["Thread/get", {"accountId": account_id, "ids": [email.thread_id]}, "t0"]
-        ])
+        responses = await self._request(
+            [["Thread/get", {"accountId": account_id, "ids": [email.thread_id]}, "t0"]]
+        )
         data = self._parse_response(responses[0], "Thread/get")
         threads = data.get("list", [])
         if not threads:
@@ -355,24 +394,37 @@ class JmapClient:
         email_ids = threads[0].get("emailIds", [])
 
         # Fetch all emails in the thread
-        responses = await self._request([
+        responses = await self._request(
             [
-                "Email/get",
-                {
-                    "accountId": account_id,
-                    "ids": email_ids,
-                    "properties": [
-                        "id", "threadId", "mailboxIds", "keywords",
-                        "size", "receivedAt", "from", "to", "cc",
-                        "subject", "preview", "hasAttachment",
-                        "textBody", "htmlBody", "bodyValues",
-                    ],
-                    "fetchTextBodyValues": True,
-                    "fetchHTMLBodyValues": True,
-                },
-                "e0",
+                [
+                    "Email/get",
+                    {
+                        "accountId": account_id,
+                        "ids": email_ids,
+                        "properties": [
+                            "id",
+                            "threadId",
+                            "mailboxIds",
+                            "keywords",
+                            "size",
+                            "receivedAt",
+                            "from",
+                            "to",
+                            "cc",
+                            "subject",
+                            "preview",
+                            "hasAttachment",
+                            "textBody",
+                            "htmlBody",
+                            "bodyValues",
+                        ],
+                        "fetchTextBodyValues": True,
+                        "fetchHTMLBodyValues": True,
+                    },
+                    "e0",
+                ]
             ]
-        ])
+        )
         data = self._parse_response(responses[0], "Email/get")
         return [Email.model_validate(e) for e in data.get("list", [])]
 
@@ -419,35 +471,46 @@ class JmapClient:
         if filter.flagged:
             jmap_filter["hasKeyword"] = "$flagged"
 
-        responses = await self._request([
+        responses = await self._request(
             [
-                "Email/query",
-                {
-                    "accountId": account_id,
-                    "filter": jmap_filter,
-                    "sort": [{"property": "receivedAt", "isAscending": False}],
-                    "limit": limit,
-                },
-                "q0",
-            ],
-            [
-                "Email/get",
-                {
-                    "accountId": account_id,
-                    "#ids": {
-                        "resultOf": "q0",
-                        "name": "Email/query",
-                        "path": "/ids",
+                [
+                    "Email/query",
+                    {
+                        "accountId": account_id,
+                        "filter": jmap_filter,
+                        "sort": [{"property": "receivedAt", "isAscending": False}],
+                        "limit": limit,
                     },
-                    "properties": [
-                        "id", "threadId", "mailboxIds", "keywords",
-                        "size", "receivedAt", "from", "to", "cc",
-                        "subject", "preview", "hasAttachment",
-                    ],
-                },
-                "g0",
-            ],
-        ])
+                    "q0",
+                ],
+                [
+                    "Email/get",
+                    {
+                        "accountId": account_id,
+                        "#ids": {
+                            "resultOf": "q0",
+                            "name": "Email/query",
+                            "path": "/ids",
+                        },
+                        "properties": [
+                            "id",
+                            "threadId",
+                            "mailboxIds",
+                            "keywords",
+                            "size",
+                            "receivedAt",
+                            "from",
+                            "to",
+                            "cc",
+                            "subject",
+                            "preview",
+                            "hasAttachment",
+                        ],
+                    },
+                    "g0",
+                ],
+            ]
+        )
 
         data = self._parse_response(responses[1], "Email/get")
         return [Email.model_validate(e) for e in data.get("list", [])]
@@ -459,9 +522,7 @@ class JmapClient:
     async def list_identities(self) -> list[Identity]:
         """List sender identities."""
         account_id = self._account_id()
-        responses = await self._request([
-            ["Identity/get", {"accountId": account_id}, "i0"]
-        ])
+        responses = await self._request([["Identity/get", {"accountId": account_id}, "i0"]])
         data = self._parse_response(responses[0], "Identity/get")
         return [Identity.model_validate(i) for i in data.get("list", [])]
 
@@ -474,7 +535,9 @@ class JmapClient:
     # ------------------------------------------------------------------
 
     async def _prepare_compose(
-        self, from_email: str | None, draft: bool,
+        self,
+        from_email: str | None,
+        draft: bool,
     ) -> _ComposeContext:
         if not draft:
             self._require_capability("urn:ietf:params:jmap:submission", "Email sending")
@@ -492,7 +555,9 @@ class JmapClient:
         return _ComposeContext(account_id, mailbox, identity, draft)
 
     async def _create_and_submit_email(
-        self, ctx: _ComposeContext, draft: _EmailDraft,
+        self,
+        ctx: _ComposeContext,
+        draft: _EmailDraft,
     ) -> str:
         email_create: dict[str, Any] = {
             "mailboxIds": {ctx.mailbox.id: True},
@@ -525,22 +590,24 @@ class JmapClient:
             ],
         ]
         if not ctx.draft and ctx.identity:
-            method_calls.append([
-                "EmailSubmission/set",
-                {
-                    "accountId": ctx.account_id,
-                    "create": {
-                        "submission": {
-                            "identityId": ctx.identity.id,
-                            "emailId": "#email",
-                        }
+            method_calls.append(
+                [
+                    "EmailSubmission/set",
+                    {
+                        "accountId": ctx.account_id,
+                        "create": {
+                            "submission": {
+                                "identityId": ctx.identity.id,
+                                "emailId": "#email",
+                            }
+                        },
+                        "onSuccessUpdateEmail": {
+                            "#submission": {"keywords/$seen": True},
+                        },
                     },
-                    "onSuccessUpdateEmail": {
-                        "#submission": {"keywords/$seen": True},
-                    },
-                },
-                "s0",
-            ])
+                    "s0",
+                ]
+            )
 
         responses = await self._request(method_calls)
         return self._parse_email_create_response(responses)
@@ -722,16 +789,18 @@ class JmapClient:
     async def move_email(self, email_id: str, mailbox_id: str) -> None:
         """Move an email to a different mailbox."""
         account_id = self._account_id()
-        responses = await self._request([
+        responses = await self._request(
             [
-                "Email/set",
-                {
-                    "accountId": account_id,
-                    "update": {email_id: {"mailboxIds": {mailbox_id: True}}},
-                },
-                "m0",
+                [
+                    "Email/set",
+                    {
+                        "accountId": account_id,
+                        "update": {email_id: {"mailboxIds": {mailbox_id: True}}},
+                    },
+                    "m0",
+                ]
             ]
-        ])
+        )
 
         data = self._parse_response(responses[0], "Email/set")
         not_updated = data.get("notUpdated", {})
@@ -750,16 +819,18 @@ class JmapClient:
     async def set_keywords(self, email_id: str, keywords: dict[str, bool]) -> None:
         """Update keywords on an email (e.g. ``{"$seen": True}`` to mark read)."""
         account_id = self._account_id()
-        responses = await self._request([
+        responses = await self._request(
             [
-                "Email/set",
-                {
-                    "accountId": account_id,
-                    "update": {email_id: {"keywords": keywords}},
-                },
-                "k0",
+                [
+                    "Email/set",
+                    {
+                        "accountId": account_id,
+                        "update": {email_id: {"keywords": keywords}},
+                    },
+                    "k0",
+                ]
             ]
-        ])
+        )
 
         data = self._parse_response(responses[0], "Email/set")
         not_updated = data.get("notUpdated", {})
@@ -784,8 +855,7 @@ class JmapClient:
         encoded_name = quote("attachment", safe="")
 
         url = (
-            self._session.download_url
-            .replace("{accountId}", account_id)
+            self._session.download_url.replace("{accountId}", account_id)
             .replace("{blobId}", encoded_blob)
             .replace("{name}", encoded_name)
             .replace("{type}", "application/octet-stream")
@@ -813,12 +883,13 @@ class JmapClient:
     async def list_masked_emails(self) -> list[MaskedEmail]:
         """List all masked email addresses."""
         self._require_capability(
-            "https://www.fastmail.com/dev/maskedemail", "Masked email",
+            "https://www.fastmail.com/dev/maskedemail",
+            "Masked email",
         )
         account_id = self._account_id()
-        responses = await self._request([
-            ["MaskedEmail/get", {"accountId": account_id, "ids": None}, "me0"]
-        ])
+        responses = await self._request(
+            [["MaskedEmail/get", {"accountId": account_id, "ids": None}, "me0"]]
+        )
         data = self._parse_response(responses[0], "MaskedEmail/get")
         return [MaskedEmail.model_validate(m) for m in data.get("list", [])]
 
@@ -830,7 +901,8 @@ class JmapClient:
     ) -> MaskedEmail:
         """Create a new masked email address."""
         self._require_capability(
-            "https://www.fastmail.com/dev/maskedemail", "Masked email",
+            "https://www.fastmail.com/dev/maskedemail",
+            "Masked email",
         )
         account_id = self._account_id()
 
@@ -842,13 +914,15 @@ class JmapClient:
         if email_prefix:
             create_obj["emailPrefix"] = email_prefix
 
-        responses = await self._request([
+        responses = await self._request(
             [
-                "MaskedEmail/set",
-                {"accountId": account_id, "create": {"new": create_obj}},
-                "me0",
+                [
+                    "MaskedEmail/set",
+                    {"accountId": account_id, "create": {"new": create_obj}},
+                    "me0",
+                ]
             ]
-        ])
+        )
 
         data = self._parse_response(responses[0], "MaskedEmail/set")
         not_created = data.get("notCreated", {})
@@ -874,7 +948,8 @@ class JmapClient:
     ) -> None:
         """Update a masked email's state, domain, or description."""
         self._require_capability(
-            "https://www.fastmail.com/dev/maskedemail", "Masked email",
+            "https://www.fastmail.com/dev/maskedemail",
+            "Masked email",
         )
         account_id = self._account_id()
 
@@ -886,13 +961,15 @@ class JmapClient:
         if description is not None:
             update_obj["description"] = description
 
-        responses = await self._request([
+        responses = await self._request(
             [
-                "MaskedEmail/set",
-                {"accountId": account_id, "update": {id: update_obj}},
-                "me0",
+                [
+                    "MaskedEmail/set",
+                    {"accountId": account_id, "update": {id: update_obj}},
+                    "me0",
+                ]
             ]
-        ])
+        )
 
         data = self._parse_response(responses[0], "MaskedEmail/set")
         not_updated = data.get("notUpdated", {})

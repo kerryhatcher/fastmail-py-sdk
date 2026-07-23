@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/header-light.svg" alt="fastmail-py-sdk" width="800px">
+  <img src="https://raw.githubusercontent.com/kerryhatcher/fastmail-py-sdk/main/assets/header-light.svg" alt="fastmail-py-sdk" width="100%">
 </p>
 
 <p align="center">

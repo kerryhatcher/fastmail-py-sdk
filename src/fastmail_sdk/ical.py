@@ -10,10 +10,9 @@ from __future__ import annotations
 
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from icalendar import Calendar as ICalendar
-from icalendar import Event as IEvent
 
 from fastmail_sdk.models.event import (
     CalendarEvent,
@@ -96,10 +95,7 @@ def _parse_datetime(line: str) -> EventDateTime:
 
     # Floating local time: YYYYMMDDTHHMMSS → YYYY-MM-DDTHH:MM:SS
     if len(value) == 15 and value[:8].isdigit():
-        value = (
-            f"{value[:4]}-{value[4:6]}-{value[6:8]}T"
-            f"{value[9:11]}:{value[11:13]}:{value[13:15]}"
-        )
+        value = f"{value[:4]}-{value[4:6]}-{value[6:8]}T{value[9:11]}:{value[11:13]}:{value[13:15]}"
     return EventDateTime(value=value, timezone=timezone, all_day=False)
 
 
@@ -288,14 +284,10 @@ def parse_ical_event(
 # ---------------------------------------------------------------------------
 
 # RFC 5545 §3.3.10 valid FREQ values
-_VALID_FREQ = frozenset(
-    {"SECONDLY", "MINUTELY", "HOURLY", "DAILY", "WEEKLY", "MONTHLY", "YEARLY"}
-)
+_VALID_FREQ = frozenset({"SECONDLY", "MINUTELY", "HOURLY", "DAILY", "WEEKLY", "MONTHLY", "YEARLY"})
 
 # RFC 5545 valid ATTENDEE ROLE values
-_VALID_ROLE = frozenset(
-    {"CHAIR", "REQ-PARTICIPANT", "OPT-PARTICIPANT", "NON-PARTICIPANT"}
-)
+_VALID_ROLE = frozenset({"CHAIR", "REQ-PARTICIPANT", "OPT-PARTICIPANT", "NON-PARTICIPANT"})
 
 # RFC 5545 valid ATTENDEE PARTSTAT values
 _VALID_PARTSTAT = frozenset(
@@ -401,7 +393,7 @@ def serialize_ical_event(event: CalendarEvent) -> str:
 
     Returns a complete iCalendar document suitable for PUT to a CalDAV server.
     """
-    now = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    now = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     lines: list[str] = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
@@ -453,7 +445,7 @@ def default_today_range() -> tuple[datetime, datetime]:
     """Return (now_utc, tomorrow_midnight_utc) — matches Rust behavior."""
     from datetime import timedelta
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     # Midnight tomorrow in UTC
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     tomorrow = today_start + timedelta(days=1)
@@ -464,7 +456,7 @@ def current_week_range() -> tuple[datetime, datetime]:
     """Return (monday 00:00, next monday 00:00) in UTC."""
     from datetime import timedelta
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     monday = now.replace(hour=0, minute=0, second=0, microsecond=0)
     monday -= timedelta(days=monday.weekday())
     next_monday = monday + timedelta(days=7)
@@ -489,14 +481,14 @@ def _parse_user_range(value: str, end_of_day: bool) -> datetime:
     try:
         dt = datetime.fromisoformat(value)
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return dt.astimezone(timezone.utc)
+            dt = dt.replace(tzinfo=UTC)
+        return dt.astimezone(UTC)
     except ValueError:
         pass
 
     # Try YYYY-MM-DD
     try:
-        dt = datetime.strptime(value, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        dt = datetime.strptime(value, "%Y-%m-%d").replace(tzinfo=UTC)
         if end_of_day:
             dt += timedelta(days=1)
         return dt
@@ -506,7 +498,7 @@ def _parse_user_range(value: str, end_of_day: bool) -> datetime:
     # Try YYYY-MM-DDTHH:MM or YYYY-MM-DDTHH:MM:SS
     for fmt in ("%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S"):
         try:
-            return datetime.strptime(value, fmt).replace(tzinfo=timezone.utc)
+            return datetime.strptime(value, fmt).replace(tzinfo=UTC)
         except ValueError:
             pass
 

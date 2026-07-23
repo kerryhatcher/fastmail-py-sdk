@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import uuid
 from xml.etree import ElementTree as ET
 
 import httpx
@@ -213,15 +212,19 @@ def _parse_vcard(text: str, href: str | None, etag: str | None) -> Contact | Non
         elif line.startswith("FN:") or line.startswith("FN;"):
             contact.name = _unescape_vcard(_parse_vcard_value(line))
         elif line.startswith("EMAIL"):
-            contact.emails.append(ContactEmail(
-                email=_parse_vcard_value(line),
-                label=_vcard_param(line, "TYPE"),
-            ))
+            contact.emails.append(
+                ContactEmail(
+                    email=_parse_vcard_value(line),
+                    label=_vcard_param(line, "TYPE"),
+                )
+            )
         elif line.startswith("TEL"):
-            contact.phones.append(ContactPhone(
-                number=_parse_vcard_value(line),
-                label=_vcard_param(line, "TYPE"),
-            ))
+            contact.phones.append(
+                ContactPhone(
+                    number=_parse_vcard_value(line),
+                    label=_vcard_param(line, "TYPE"),
+                )
+            )
         elif line.startswith("ORG:"):
             contact.organization = _unescape_vcard(_parse_vcard_value(line))
         elif line.startswith("TITLE:"):
@@ -297,7 +300,7 @@ def _build_group_href(addressbook_href: str, uid: str) -> str:
 def _extract_location(headers: httpx.Headers) -> str | None:
     loc = headers.get("Location")
     if loc and loc.startswith(CARDDAV_BASE):
-        return loc[len(CARDDAV_BASE):]
+        return loc[len(CARDDAV_BASE) :]
     return loc
 
 
@@ -350,7 +353,8 @@ class CardDavClient:
         """Discover address books for the user."""
         url = f"{self.base_url}/dav/addressbooks/user/{self.username}/"
         resp = await self.client.request(
-            "PROPFIND", url,
+            "PROPFIND",
+            url,
             content=_addressbook_propfind(),
             headers={"Content-Type": "application/xml", "Depth": "1"},
         )
@@ -371,9 +375,7 @@ class CardDavClient:
             href_el = response.find(f"{_tag(_DAV_NS, 'href')}")
             href = href_el.text.strip() if href_el is not None and href_el.text else ""
 
-            is_addressbook = (
-                response.find(f".//{_tag(_CARDDAV_NS, 'addressbook')}") is not None
-            )
+            is_addressbook = response.find(f".//{_tag(_CARDDAV_NS, 'addressbook')}") is not None
             if not is_addressbook or not href:
                 continue
 
@@ -382,8 +384,10 @@ class CardDavClient:
                 continue
 
             name_el = response.find(f".//{_tag(_DAV_NS, 'displayname')}")
-            name = name_el.text.strip() if name_el is not None and name_el.text else (
-                href.rstrip("/").rsplit("/", 1)[-1]
+            name = (
+                name_el.text.strip()
+                if name_el is not None and name_el.text
+                else (href.rstrip("/").rsplit("/", 1)[-1])
             )
 
             addressbooks.append(AddressBook(href=href, name=name))
@@ -405,7 +409,8 @@ class CardDavClient:
         """List all contacts in an address book."""
         url = f"{self.base_url}{addressbook_href}"
         resp = await self.client.request(
-            "REPORT", url,
+            "REPORT",
+            url,
             content=_addressbook_query(),
             headers={"Content-Type": "application/xml", "Depth": "1"},
         )
@@ -436,7 +441,8 @@ class CardDavClient:
             all_contacts.extend(contacts)
 
         return [
-            c for c in all_contacts
+            c
+            for c in all_contacts
             if query_lower in c.name.lower()
             or any(query_lower in e.email.lower() for e in c.emails)
             or (c.organization and query_lower in c.organization.lower())
@@ -453,7 +459,9 @@ class CardDavClient:
         raise FastmailError(f"Contact not found: {contact_id}")
 
     async def create_contact(
-        self, addressbook_href: str, contact: Contact,
+        self,
+        addressbook_href: str,
+        contact: Contact,
     ) -> ContactCreateResult:
         """Create a new contact."""
         href = _build_contact_href(addressbook_href, contact.id)
@@ -461,7 +469,8 @@ class CardDavClient:
         vcard = serialize_vcard(contact)
 
         resp = await self.client.put(
-            url, content=vcard,
+            url,
+            content=vcard,
             headers={
                 "Content-Type": "text/vcard; charset=utf-8",
                 "If-None-Match": "*",
@@ -482,14 +491,18 @@ class CardDavClient:
         )
 
     async def update_contact(
-        self, href: str, etag: str, contact: Contact,
+        self,
+        href: str,
+        etag: str,
+        contact: Contact,
     ) -> str:
         """Update an existing contact. Returns the new ETag."""
         url = f"{self.base_url}{href}"
         vcard = serialize_vcard(contact)
 
         resp = await self.client.put(
-            url, content=vcard,
+            url,
+            content=vcard,
             headers={
                 "Content-Type": "text/vcard; charset=utf-8",
                 "If-Match": etag,
@@ -543,7 +556,8 @@ class CardDavClient:
             try:
                 url = f"{self.base_url}{ab.href}"
                 resp = await self.client.request(
-                    "REPORT", url,
+                    "REPORT",
+                    url,
                     content=_addressbook_query(),
                     headers={"Content-Type": "application/xml", "Depth": "1"},
                 )
@@ -582,7 +596,9 @@ class CardDavClient:
         return matches[0]
 
     async def create_group(
-        self, addressbook_href: str, group: ContactGroup,
+        self,
+        addressbook_href: str,
+        group: ContactGroup,
     ) -> ContactCreateResult:
         """Create a new contact group."""
         href = _build_group_href(addressbook_href, group.id)
@@ -590,7 +606,8 @@ class CardDavClient:
         vcard = serialize_group_vcard(group)
 
         resp = await self.client.put(
-            url, content=vcard,
+            url,
+            content=vcard,
             headers={
                 "Content-Type": "text/vcard; charset=utf-8",
                 "If-None-Match": "*",
@@ -611,7 +628,11 @@ class CardDavClient:
         )
 
     async def rename_group(
-        self, href: str, etag: str, group: ContactGroup, new_name: str,
+        self,
+        href: str,
+        etag: str,
+        group: ContactGroup,
+        new_name: str,
     ) -> str:
         """Rename a contact group. Returns the new ETag."""
         updated = ContactGroup(
@@ -625,7 +646,8 @@ class CardDavClient:
         vcard = serialize_group_vcard(updated)
 
         resp = await self.client.put(
-            url, content=vcard,
+            url,
+            content=vcard,
             headers={
                 "Content-Type": "text/vcard; charset=utf-8",
                 "If-Match": etag,
@@ -666,7 +688,11 @@ class CardDavClient:
         )
 
     async def add_group_member(
-        self, href: str, etag: str, group: ContactGroup, contact_id: str,
+        self,
+        href: str,
+        etag: str,
+        group: ContactGroup,
+        contact_id: str,
     ) -> str:
         """Add a contact to a group. Returns the new ETag."""
         if contact_id in group.member_uids:
@@ -682,7 +708,11 @@ class CardDavClient:
         return await self.rename_group(href, etag, updated, group.name)
 
     async def remove_group_member(
-        self, href: str, etag: str, group: ContactGroup, contact_id: str,
+        self,
+        href: str,
+        etag: str,
+        group: ContactGroup,
+        contact_id: str,
     ) -> str:
         """Remove a contact from a group. Returns the new ETag."""
         if contact_id not in group.member_uids:
