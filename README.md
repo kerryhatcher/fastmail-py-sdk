@@ -1,15 +1,12 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/header.svg">
-    <img src="assets/header-light.svg" alt="fastmail-py-sdk" width="800px">
-  </picture>
+  <img src="assets/header-light.svg" alt="fastmail-py-sdk" width="800px">
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/v/fastmail-py-sdk" alt="PyPI"></a>
-  <a href="https://github.com/kwhatcher/fastmail-py-sdk/actions"><img src="https://img.shields.io/github/actions/workflow/status/kwhatcher/fastmail-py-sdk/ci.yml" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
-  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/pyversions/fastmail-py-sdk" alt="Python 3.13+"></a>
+  <a href="https://github.com/kerryhatcher/fastmail-py-sdk/actions"><img src="https://img.shields.io/github/actions/workflow/status/kerryhatcher/fastmail-py-sdk/ci.yml" alt="CI"></a>
+  <a href="https://pypi.org/project/fastmail-py-sdk/"><img src="https://img.shields.io/pypi/v/fastmail-py-sdk" alt="PyPI"></a>
+  <a href="#"><img src="https://img.shields.io/badge/python-3.13+-blue" alt="Python 3.13+"></a>
 </p>
 
 **fastmail-py-sdk** is an async Python SDK for the
@@ -121,7 +118,7 @@ pip install fastmail-py-sdk
 ### From source
 
 ```bash
-git clone https://github.com/kwhatcher/fastmail-py-sdk.git
+git clone https://github.com/kerryhatcher/fastmail-py-sdk.git
 cd fastmail-py-sdk
 uv sync
 ```
@@ -492,8 +489,8 @@ account required:
 uv run pytest
 ```
 
-<a href="https://github.com/kwhatcher/fastmail-py-sdk/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=kwhatcher/fastmail-py-sdk" />
+<a href="https://github.com/kerryhatcher/fastmail-py-sdk/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=kerryhatcher/fastmail-py-sdk" />
 </a>
 
 This project follows the
@@ -501,9 +498,9 @@ This project follows the
 
 ## 💬 Getting Help
 
-- [GitHub Issues](https://github.com/kwhatcher/fastmail-py-sdk/issues) — bug
+- [GitHub Issues](https://github.com/kerryhatcher/fastmail-py-sdk/issues) — bug
   reports and feature requests
-- [GitHub Discussions](https://github.com/kwhatcher/fastmail-py-sdk/discussions) —
+- [GitHub Discussions](https://github.com/kerryhatcher/fastmail-py-sdk/discussions) —
   questions, ideas, and community chat
 - [SECURITY.md](SECURITY.md) — vulnerability reporting (private channel)
 

@@ -10,7 +10,7 @@ to get started.
 - [uv](https://docs.astral.sh/uv/) (package manager)
 
 ```bash
-git clone https://github.com/kwhatcher/fastmail-py-sdk.git
+git clone https://github.com/kerryhatcher/fastmail-py-sdk.git
 cd fastmail-py-sdk
 uv sync
 ```
@@ -63,9 +63,9 @@ for commit messages. Squash commits before merging.
 
 ## Finding Something to Work On
 
-- [Good first issues](https://github.com/kwhatcher/fastmail-py-sdk/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) are tagged for newcomers
-- [Help wanted](https://github.com/kwhatcher/fastmail-py-sdk/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) are higher-priority tasks
-- Check the [roadmap](https://github.com/kwhatcher/fastmail-py-sdk/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap) for upcoming features
+- [Good first issues](https://github.com/kerryhatcher/fastmail-py-sdk/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) are tagged for newcomers
+- [Help wanted](https://github.com/kerryhatcher/fastmail-py-sdk/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) are higher-priority tasks
+- Check the [roadmap](https://github.com/kerryhatcher/fastmail-py-sdk/issues?q=is%3Aissue+is%3Aopen+label%3Aroadmap) for upcoming features
 
 ## Architecture
 
